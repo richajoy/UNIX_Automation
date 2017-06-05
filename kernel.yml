@@ -1,0 +1,89 @@
+---
+  - debug: msg="{{ansible_memtotal_mb}}"
+
+  - name: Ensure /etc/security/limits.d directory exists
+    file: path=/etc/security/limits.d state=directory
+    ignore_errors: yes
+
+  - name: Create the 99-sysctl.conf file if doesn't exist
+    file: path=/etc/sysctl.d/99-sysctl.conf state=touch
+
+  - name: SHM value to set for memory size less than 16G
+    lineinfile:
+      dest: /etc/sysctl.d/99-sysctl.conf
+      regexp: "^{{ item.prop }}="
+      line: "{{ item.prop }}={{ item.value }}"
+    with_items:
+      - { prop: 'kernel.shmall', value: '3670016' }
+      - { prop: 'kernel.shmmax', value: '15032385536' }
+    when: ansible_memtotal_mb <= {{ shmall_ent }}
+
+  - name: SHM value to set for memory size between 16G and 32G
+    lineinfile:
+      dest: /etc/sysctl.d/99-sysctl.conf
+      regexp: "^{{ item.prop }}="
+      line: "{{ item.prop }}={{ item.value }}"
+    with_items:
+      - { prop: 'kernel.shmall', value: '7340032' }
+      - { prop: 'kernel.shmmax', value: '26843545600' }
+    when: (ansible_memtotal_mb > {{ shmall_ent }} and ansible_memtotal_mb <= {{ shmall_mid }})|int
+  
+  - name: SHM value to set for memory size between 32G and 64G
+    lineinfile:
+      dest: /etc/sysctl.d/99-sysctl.conf
+      regexp: "^{{ item.prop }}="
+      line: "{{ item.prop }}={{ item.value }}"
+    with_items:
+      - { prop: 'kernel.shmall', value: '14680064' }
+      - { prop: 'kernel.shmmax', value: '60129542144' }
+    when: (ansible_memtotal_mb > {{ shmall_mid }} and ansible_memtotal_mb <= {{ shmall_lar }})|int
+
+  - name: SHM value to set for memory size between 64G and 256G
+    lineinfile:
+      dest: /etc/sysctl.d/99-sysctl.conf
+      regexp: "^{{ item.prop }}="
+      line: "{{ item.prop }}={{ item.value }}"
+    with_items:
+      - { prop: 'kernel.shmall', value: '57671680' }
+      - { prop: 'kernel.shmmax', value: '257698037760' }
+    when: (ansible_memtotal_mb > {{ shmall_lar }} and ansible_memtotal_mb <= {{ shmall_exlar }})|int
+
+  - name: HugePage calculation for DB
+    set_fact:
+      hugepages: "{{ ((((1024*ansible_memtotal_mb)/2048)*65)/100)|int|abs }}"
+  - name: Set kernel paramaters in sysctl file
+    lineinfile:
+      dest: /etc/sysctl.d/99-sysctl.conf
+      regexp: "^{{ item.prop }}="
+      line: "{{ item.prop }}={{ item.value }}"
+    with_items:
+      - { prop: "vm.nr_hugepages", value: "{{ hugepages }}" }
+      - { prop: "kernel.shmmni", value: "4096" }
+      - { prop: "kernel.msgmax", value: "65536" }
+      - { prop: "kernel.msgmnb", value: "65536" }
+      - { prop: "kernel.sem", value: "250 32000 100 128" }
+      - { prop: "fs.file-max", value: "6815744" }
+      - { prop: "fs.aio-max-nr", value: "1048576" }
+      - { prop: "net.ipv4.ip_local_port_range", value: "9000 65500" }
+      - { prop: "net.core.rmem_default", value: "262144" }
+      - { prop: "net.core.rmem_max", value: "4194304" }
+      - { prop: "net.core.wmem_default", value: "262144" }
+      - { prop: "net.core.wmem_max", value: "1048576" }
+      - { prop: "net.ipv4.ip_forward", value: "0" }
+      - { prop: "net.ipv4.conf.default.rp_filter", value: "1" }
+      - { prop: "net.ipv4.conf.default.accept_source_route", value: "0" }
+      - { prop: "kernel.sysrq", value: "1" }
+      - { prop: "kernel.core_uses_pid", value: " 1" }
+      - { prop: "net.ipv4.tcp_syncookies", value: "1" }
+      - { prop: "kernel.panic_on_oops", value: "1" }
+      - { prop: "kernel.unknown_nmi_panic", value: "1" }
+      - { prop: "kernel.panic_on_unrecovered_nmi", value: "1" }
+      - { prop: "net.ipv6.conf.{{ ansible_default_ipv4.alias }}.disable_ipv6", value: "1" }
+      - { prop: "net.ipv6.conf.{{ ansible_default_ipv4.alias }}.accept_ra", value: "0" }
+      - { prop: "net.ipv6.conf.{{ ansible_default_ipv4.alias }}.accept_ra_defrtr", value: "0" }
+      - { prop: "net.ipv6.conf.{{ ansible_default_ipv4.alias }}.accept_ra_pinfo", value: "0" }
+      - { prop: "net.ipv6.conf.{{ ansible_default_ipv4.alias }}.accept_ra_rtr_pref", value: "0" }
+  - name: Save sysctl.conf config
+    command: sysctl -p
+    ignore_errors: yes
+

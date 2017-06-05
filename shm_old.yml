@@ -1,0 +1,38 @@
+---
+  - debug: msg="{{ansible_memtotal_mb}}"
+
+  - name: SHM value to set for memory size less than 16G
+    sysctl:
+      name: kernel.shmall
+      value: 3670016
+      name: kernel.shmmax
+      value: 15032385536
+      sysctl_file: /etc/sysctl.d/99-sysctl.conf
+    when: ansible_memtotal_mb <= {{ shmall_ent }}
+
+  - name: SHM value to set for memory size between 16G and 32G
+    sysctl:
+      name: kernel.shmall
+      value: 7340032
+      name: kernel.shmmax
+      value: 26843545600
+      sysctl_file: /etc/sysctl.d/99-sysctl.conf
+    when: (ansible_memtotal_mb > {{ shmall_ent }} and ansible_memtotal_mb <= {{ shmall_mid }})|int
+  
+  - name: SHM value to set for memory size between 32G and 64G
+    sysctl:
+      name: kernel.shmall
+      value: 14680064
+      name: kernel.shmmax
+      value: 60129542144
+      sysctl_file: /etc/sysctl.d/99-sysctl.conf
+    when: (ansible_memtotal_mb > {{ shmall_mid }} and ansible_memtotal_mb <= {{ shmall_lar }})|int
+ 
+  - name: SHM value to set for memory size between 64G and 256G
+    sysctl:
+      name: kernel.shmall
+      value: 57671680
+      name: kernel.shmmax
+      value: 257698037760
+      sysctl_file: /etc/sysctl.d/99-sysctl.conf
+    when: (ansible_memtotal_mb > {{ shmall_lar }} and ansible_memtotal_mb <= {{ shmall_exlar }})|int

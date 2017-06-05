@@ -1,0 +1,7 @@
+---
+
+- name: Amgen Oracle build
+  hosts: myHosts
+  become: true
+  roles:
+  - { role: ora-unix }
