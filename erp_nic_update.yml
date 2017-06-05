@@ -13,7 +13,7 @@
     basedir_ERP: '/home/rjoy/ansible/ERP_NIC/'
 
   tasks:
-    - name: Define file to copy for ERP
+    - name: Define file to copy for network config update
       copy: 
         src: '{{ basedir_ERP }}'
         dest: /etc/sysconfig/network-scripts/ 
