@@ -1,8 +1,0 @@
----
-SITE: 'aws'
-SRCDIR: 'active_prod'
-AMGEN_OPERATING_ENVIRONMENT: "{{ ansible_hostname[5] }}"
-shmall_ent: 16384
-shmall_mid: 32768
-shmall_lar: 65536
-shmall_exlar: 262144
