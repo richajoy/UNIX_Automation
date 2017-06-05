@@ -1,5 +1,5 @@
 ---
-- name: Playbook for resizing the partition
+- name: Playbook for unmounting the partitions and subpartitions under /sapdb
   hosts: erp
   gather_facts: no
   user: rjoy
