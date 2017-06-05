@@ -4,21 +4,21 @@
   set_fact: 
       oracle_netgroup: dba-admin-dev-grp 
       oracle_sudogroup: 50_dba-admin-dev-grp 
-  when: (AMGEN_OPERATING_ENVIRONMENT == "d") or
-        (AMGEN_OPERATING_ENVIRONMENT == "s") or
-        (AMGEN_OPERATING_ENVIRONMENT == "e") 
+  when: (AMN_OPERATING_ENVIRONMENT == "d") or
+        (AMN_OPERATING_ENVIRONMENT == "s") or
+        (AMN_OPERATING_ENVIRONMENT == "e") 
 
 - name: Set netgroup to dba-admin-tst-grp if host is in test
   set_fact:
       oracle_netgroup: dba-admin-tst-grp
       oracle_sudogroup: 50_dba-admin-tst-grp
-  when: (AMGEN_OPERATING_ENVIRONMENT == "t") 
+  when: (AMN_OPERATING_ENVIRONMENT == "t") 
 
 - name: Set netgroup to dba-admin-prd-grp if host is in prod 
   set_fact:
       oracle_netgroup: dba-admin-prd-grp
       oracle_sudogroup: 50_dba-admin-prd-grp
-  when: (AMGEN_OPERATING_ENVIRONMENT == "p") 
+  when: (AMN_OPERATING_ENVIRONMENT == "p") 
 
 #- name: copy Oracle rpms file
 #  copy: src={{ SRCDIR }}/packages.sh dest=/tmp owner=root group=root mode=0644
@@ -160,7 +160,7 @@
   when: grep_result|failed
 
 - name: test amgen OE  var
-  debug: var=AMGEN_OPERATING_ENVIRONMENT
+  debug: var=AMN_OPERATING_ENVIRONMENT
 
 - name: Play for database package requisites
   include: "pkg.yml"
