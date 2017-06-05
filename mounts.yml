@@ -1,5 +1,5 @@
 ---
-- name: Playbook for resizing the partition
+- name: Playbook for checking the partition size
   hosts: erp
   gather_facts: no
   user: rjoy
