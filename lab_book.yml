@@ -1,0 +1,27 @@
+---
+- hosts: sandbox
+  user: rjoy
+  sudo: yes
+  connection: ssh
+  gather_facts: yes
+  vars:
+   playbook_version: 0.1b
+  vars_files:
+  - conf/copyright.yml
+  vars_prompt:
+  - name: web_domain
+    prompt: Web Domain
+  tasks:
+#  - name: Install Lynx Web Browser
+#    action: yum name=lynx state=installed
+#  - name: Check for the telnet client
+#    action: yum name=telnet state=absent
+#  - name: Install Apache web server
+#    action: yum name=httpd state=installed
+   - name: Create a directory
+     action: file path=/tmp/test state=directory mode=0755
+     notify: Restart NTPD
+  handlers:
+  - name: Restart NTPD
+    action: service name=ntpd state=restarted 
+  

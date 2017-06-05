@@ -1,0 +1,16 @@
+---
+- name: Playbook for changing the SELINUX policy
+  hosts: erp
+  gather_facts: no
+  user: rjoy
+  become: true
+  tasks:
+   - name: Set SELINUX to disabled for DB servers
+     lineinfile: 
+       dest: '/etc/selinux/config'
+       regexp: '^SELINUX='
+       line: 'SELINUX=disabled'
+
+   - name: Reboot the server
+     command: reboot
+

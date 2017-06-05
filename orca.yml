@@ -1,0 +1,15 @@
+---
+- hosts: orca_hosts
+  user: rjoy
+  connection: ssh
+  gather_facts: no
+  become: yes
+  tasks:
+    - name: Gather the orca client info
+      shell: ls -lrt /opt/orca/var/orca/cronjobs/etc | awk '{print $9}'
+      register: result
+#    - name: Read each directory
+#      shell: "cat {{ item }} >> /tmp/orca.out"
+#      when: result.stdout != -1
+#      with_items:
+#          - "{{ result.stdout_lines }}"

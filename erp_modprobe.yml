@@ -1,0 +1,20 @@
+---
+#PURPOSE: Playbook to update the sunrpc-local file as per storage team update
+- name: Copy and overwrite the sunrpc-local.conf file
+  hosts: ERP
+  gather_facts: yes
+  user: rjoy
+  become: true
+
+  environment:
+    PATH: '/usr/sbin:/sbin:/usr/bin:/bin'
+
+  vars:
+    basedir_ERP: '/home/rjoy/ansible/ERP_MODE_NIC/'
+
+  tasks:
+    - name: Define file to copy for ERP
+      copy: 
+        src: '{{ basedir_ERP }}'
+        dest: /etc/modprobe.d/ 
+
