@@ -1,0 +1,30 @@
+---
+- hosts: sandbox
+  user: rjoy
+  become: yes
+  gather_facts: yes
+  tasks:
+    - name: Date/Time stamp when the playbook starts
+      command: /bin/date
+      register: timestamp_start
+    - debug: var=timestamp_start
+    - name: Install the apache webserver
+      yum: pkg=httpd state=latest
+      notify: start HTTPD
+    - name: Verify that the web service is running
+      command: systemctl status httpd
+      register: result
+    - debug: var=result
+    - name: Install client software
+      yum: pkg=telnet state=latest
+    - name: Log all the packages installed on the system
+      command: yum list installed
+      register: installed_result
+    - debug: var=installed_result
+    - name: date/time stamp when the playbook ends
+      command: /bin/date
+      register: timestamp_end
+    - debug: var=timestamp_end
+   handlers:
+    - name: start HTTPD
+      service: name=httpd state=restarted

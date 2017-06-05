@@ -1,0 +1,19 @@
+---
+- hosts: maximo_hosts
+  user: rjoy
+  connection: ssh
+  gather_facts: no
+  become_method: sudo
+  become_user: root
+  become: yes
+  tasks:
+#   - name: Check the file stat
+#     stat: path=/var/log/messages-20170326
+#     register: result
+
+   - name: Copy files if exist
+     copy: src={{ item }} dest=/tmp mode=0655 remote_src=True
+     with_items:
+      - /var/log/messages-20170326
+      - /var/log/sa/sa23
+#     when: result.stat.exists

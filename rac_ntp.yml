@@ -1,0 +1,21 @@
+---
+#Ansible playbook to update the /etc/sysconfig/ntpd file as per Oracle RAC policy
+- name: Update the ntp daemon to resync everytime you restart the service.
+  hosts: rac_nodes
+  gather_facts: no
+  user: rjoy
+  become: true
+
+  environment:
+    PATH: '/usr/sbin:/sbin:/usr/bin:/bin'
+
+  tasks:
+    - name: Substitute line in ntpd config
+      lineinfile:
+         dest: /etc/sysconfig/ntpd
+         regexp: 'OPTIONS'
+         line: 'OPTIONS="-x -u ntp:ntp -p /var/run/ntpd.pid"'
+         backup: yes
+
+    - name: Restart ntpd service
+      service: name=ntpd state=restarted

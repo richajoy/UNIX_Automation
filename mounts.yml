@@ -1,0 +1,11 @@
+---
+- name: Playbook for checking the partition size
+  hosts: erp
+  gather_facts: no
+  user: rjoy
+  become: true
+  tasks:
+    - name: sort the mounts
+      shell: df -h | sort
+      register: result
+    - debug: var=result

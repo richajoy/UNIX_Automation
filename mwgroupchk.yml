@@ -1,0 +1,20 @@
+---
+- hosts: mw_hosts
+  user: rjoy
+  connection: ssh
+  gather_facts: no
+  become: yes
+  tasks:
+    - name: Gather Middleware sudo groups
+      shell: find /etc/sudoers.d -name 50_*  -exec ls -lrt {} \; | awk '{print $9}'
+      register: result
+    - name: Read each file
+      shell: "cat {{ item }} > /share/scratch/rjoy/{{ item }}.out" 
+      register: checkfile
+      when: result.stdout != -1
+      with_items:
+       - "{{ result.stdout_lines }}" 
+
+      
+#    - local_action: copy content="{{ output.stdout }}" "/home/rjoy/mw.out"
+#      become: false

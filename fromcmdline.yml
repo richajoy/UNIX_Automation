@@ -1,0 +1,12 @@
+--- #Variables Passing Example
+- hosts: '{{ hosts }}'
+  user: ' {{ user }}'
+  become: yes
+  connection: ssh
+  gather_facts: no
+  tasks: 
+    - name: List the directory
+      shell: ls -lrt {{ dir }}
+      register: output
+    - debug: var=output
+#Execution example: ansible-playbook  fromcmdline.yml --extra-vars="hosts=sandbox user=rjoy dir=/var"

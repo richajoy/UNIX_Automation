@@ -1,0 +1,12 @@
+---
+- name: Playbook to run a remote command
+  hosts: TFA
+  gather_facts: no
+  become: true
+  tasks:
+    - name: Start tfs service
+      raw: /u01/app/grid/12.1.0.2/bin/tfactl start
+      register: result
+
+    - name: Run the remote command
+      raw: sh /u01/app/grid/12.1.0.2/tfa/bin/tfactl diagcollect -from "APR/10/2017 21:00:00" -to "APR/10/2017 21:15:00" > /tmp/tfa.out
