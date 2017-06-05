@@ -1,4 +1,4 @@
---- #Playbook for debug module usage
+--- #Playbook for Installing Apache
 - hosts: sandbox
   remote_user: rjoy
   become: yes
@@ -6,7 +6,7 @@
   connection: ssh 
   gather_facts: no
   tasks:
- - name: Inatalling httpd
+ - name: Installing httpd
    yum:
       name: httpd
       state: latest
