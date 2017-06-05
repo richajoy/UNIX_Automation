@@ -1,6 +1,6 @@
 ---
 #PURPOSE: Playbook to update the sunrpc-local file as per storage team update
-- name: Update the sunrpc-local.conf file
+- name: Copy and overwrite the sunrpc-local.conf file
   hosts: ERP
   gather_facts: yes
   user: rjoy
