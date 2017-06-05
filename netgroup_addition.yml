@@ -1,0 +1,14 @@
+---
+- name: Playbook for adding netgroup to access.conf
+  hosts: bkp
+  gather_facts: no
+  user: rjoy
+  become: true
+  tasks:
+   - name: Add the backup netgroup entry to access.conf
+     lineinfile:
+        dest: /etc/security/access.conf
+        line: '+:@bur-service:ALL'
+        insertbefore: '-:ALL:ALL'
+        backup: yes
+...

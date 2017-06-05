@@ -1,0 +1,19 @@
+---
+- name: Playbook for adding NFS mountpoint
+  hosts: erp
+  gather_facts: no
+  user: rjoy
+  become: true
+  tasks:
+    - name: Create the auto.direct file if doesn't exist
+      file: path=/etc/auto.direct state=touch
+      ignore_errors: yes
+
+    - name: Add mount entry to /etc/auto.direct
+      lineinfile:
+         dest: /etc/auto.direct
+         line: '/Media     uslv-cf03-cf03-lif4:/v_cf03_multi_EISTS0008'
+         backup: yes
+
+    - name: Restart the autofs service
+      service: name=autofs state=reloaded

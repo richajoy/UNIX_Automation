@@ -1,0 +1,30 @@
+---
+- name: Test  Playbook
+  user: rjoy
+  hosts: gerb
+  become_method: sudo
+  become_user: root
+  become: true
+  gather_facts: true
+
+  tasks:
+        - name: Check the entry exists
+          command: egrep -i "gerb" /etc/security/access.conf
+
+#        - name: Add the netgroup entry
+#          lineinfile: dest=/etc/security/access.conf insertbefore="-:ALL:ALL" line="+:@mw-admin-login-grp:ALL" state=present
+
+#         - name: Check that isi-j2ee-grp netgroup exists
+#           stat: path=/etc/sudoers.d/50_isi-j2ee-grp
+#           register: stat_result
+#           become: true
+
+#         - shell: 'echo  $HOSTNAME No >> /home/rjoy/ansible/output/mw.log'
+#           when: stat_result.stat.exists == False
+#           become: false
+
+#         - shell: 'echo $HOSTNAME  Yes >> /home/rjoy/ansible/output/mw.log'
+#           when: stat_result.stat.exists == True
+#           become: false
+ 
+...

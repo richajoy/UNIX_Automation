@@ -1,0 +1,23 @@
+---
+- hosts: sandbox
+  user: rjoy
+  become: yes
+  gather_facts: yes
+  tasks:
+  - debug: msg="{{ansible_memtotal_mb}}"
+  
+  - name: SHMALL value for MEM less than 16G
+    set_fact:
+       shmall: "3670016"
+       when: >
+             ansible_memtotal_mb|int <= "16384"
+  
+  - name: SHMALL value for MEM is between 16G and 32G
+    set_fact:
+       shmall: "7340032"
+       when: >
+             ansible_memtotal_mb|int > "16384" and 
+             ansible_memtotal_mb|int <= "32768"
+
+  - debug: var=shmall
+

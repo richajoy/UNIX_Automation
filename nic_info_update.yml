@@ -1,0 +1,30 @@
+---
+#PURPOSE: Playbook to update the nic info for test & prod builds
+- name: NIC FILE UPDATE FOR BUILDS
+  hosts: rac_nodes
+  gather_facts: yes
+  user: rjoy
+  become: true
+
+  environment:
+    PATH: '/usr/sbin:/sbin:/usr/bin:/bin'
+
+  vars:
+    basedir_test: '/home/rjoy/ansible/test-eth/'
+    basedir_prd: '/home/rjoy/ansible/prd-eth/'
+    OP_ENV: "{{ ansible_hostname[5] }}"
+
+  tasks:
+    - name: Define file to copy for Test
+      copy: 
+        src: '{{ basedir_test }}'
+        dest: /etc/sysconfig/network-scripts/ 
+        backup: yes
+      when: (OP_ENV == "t")
+   
+    - name: Define file to copy for Prod
+      copy: 
+        src: '{{ basedir_prd }}'
+        dest: /etc/sysconfig/network-scripts/ 
+        backup: yes
+      when: (OP_ENV == "p")

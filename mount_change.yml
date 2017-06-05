@@ -1,0 +1,14 @@
+---
+- name: Playbook for changing mounts info on fstab in erp servers
+  hosts: erp_ascs
+  gather_facts: no
+  user: rjoy
+  become: true
+  tasks:
+    - name: Replace a regular expression in fstab
+      replace:
+        dest: /etc/fstab
+        regexp: 'ERS10'
+        replace: 'SCS00'
+        backup: yes
+...

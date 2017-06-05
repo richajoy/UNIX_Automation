@@ -1,0 +1,32 @@
+---
+#PURPOSE: Playbook to update the nic info for test & prod builds
+- name: NIC FILE UPDATE FOR BUILDS
+  hosts: ERP
+  gather_facts: yes
+  user: rjoy
+  become: true
+
+  environment:
+    PATH: '/usr/sbin:/sbin:/usr/bin:/bin'
+
+  vars:
+    basedir_ERP: '/home/rjoy/ansible/ERP_NIC/'
+
+  tasks:
+    - name: Define file to copy for ERP
+      copy: 
+        src: '{{ basedir_ERP }}'
+        dest: /etc/sysconfig/network-scripts/ 
+
+    - name: Add entry for network config file
+      lineinfile:
+         dest: /etc/sysconfig/network
+         line: 'NETWORKING=yes'
+         insertafter: 'Created by anaconda'
+   
+    - name: stat ksdev file
+      stat: path=/etc/sysconfig/network-scripts/ifcfg-ksdev0
+      register: ksdev_stat
+
+    - name: Move ksdev file
+      raw: mv /etc/sysconfig/network-scripts/ifcfg-ksdev0 /var/tmp

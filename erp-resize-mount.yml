@@ -1,0 +1,21 @@
+---
+- name: Playbook for resizing the partition
+  hosts: erp
+  gather_facts: no
+  user: rjoy
+  become: true
+  tasks:
+    - name: Check if /sapdb/ mounted on /dev/sde
+      shell: df -h | grep "/sapdb" | egrep -v "JS1" | awk '{print $1}'
+      register: sapdb
+    - debug: var=sapdb.stdout_lines
+   
+    - name: Check the subdirectory mounts
+      shell: df -h | grep "/sapdb" | sort -r | awk '{print $6}'
+      register: umounts
+
+    - name: Unmount the directories
+      shell: umount -l {{ item }}
+      with_items:
+       - "{{ umounts.stdout_lines }}"
+

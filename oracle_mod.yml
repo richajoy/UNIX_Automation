@@ -1,0 +1,44 @@
+---
+- hosts: sandbox
+  user: rjoy
+  become: yes
+  gather_facts: yes
+  vars:
+      shmall_ent: 16384
+      shmall_mid: 32768
+      shmall_lar: 65536
+      shmall_exlar: 262144 
+  tasks:
+#   - debug: msg="{{ansible_memtotal_mb}}"
+#   - debug: msg="{{shmall_first}}"
+    - name: SHMALL value to set for memory size less than 16G
+      sysctl:
+         name: kernel.shmall
+         value: 3670016
+         sysctl_file: /etc/sysctl.d/99-sysctl.conf
+         when: ansible_memtotal_mb <= {{ shmall_ent }}
+  
+#   - debug: msg="{{shmall_sec}}"
+    - name: SHMALL value to set for memory size between 16G and 32G
+      sysctl:
+         name: kernel.shmall
+         value: 7340032
+         sysctl_file: /etc/sysctl.d/99-sysctl.conf
+         when: (ansible_memtotal_mb > {{ shmall_ent }} and ansible_memtotal_mb <= {{ shmall_mid }})|int
+
+    - name: SHMALL value to set for memory size between 32G and 64G
+      sysctl:
+         name: kernel.shmall
+         value: 14680064
+         sysctl_file: /etc/sysctl.d/99-sysctl.conf
+         when: (ansible_memtotal_mb > {{ shmall_mid }} and ansible_memtotal_mb <= {{ shmall_lar }})|int
+
+    - name: SHMALL value to set for memory size between 64G and 256G
+      sysctl:
+         name: kernel.shmall
+         value: 57671680
+         sysctl_file: /etc/sysctl.d/99-sysctl.conf
+         when: (ansible_memtotal_mb > {{ shmall_lar }} and ansible_memtotal_mb <= {{ shmall_exlar }})|int
+
+#  - debug: var=shmall
+

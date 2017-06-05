@@ -1,0 +1,11 @@
+--- #This is the structural YAML example to install hpptd on hosts
+- hosts: sandbox
+  remote_user: rjoy
+  become: yes
+  become_method: sudo
+  gather_facts: yes
+  
+  tasks:
+  - name: Install HTTPD server on the said hosts
+    yum: name=httpd state=latest update_cache=yes
+     

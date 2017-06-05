@@ -1,0 +1,16 @@
+---
+- hosts: sandbox
+  sudo: yes
+  connection: ssh
+  user: rjoy
+  gather_facts: no
+  tasks:
+   - name: Installing Apache Web Server
+     yum: pkg=httpd state=latest
+   - name: Verify Service status
+     shell: systemctl status httpd
+     register: result
+     until: result.stdout.find("active (running)") != -1
+     retries: 5
+     delay: 5
+   - debug: var=result

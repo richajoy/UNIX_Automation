@@ -1,0 +1,14 @@
+--- #Playbook for debug module usage
+- hosts: sandbox
+  remote_user: rjoy
+  become: yes
+  become_method: sudo
+  connection: ssh 
+  gather_facts: no
+  tasks:
+ - name: Inatalling httpd
+   yum:
+      name: httpd
+      state: latest
+      register: result
+    - debug: var=result 

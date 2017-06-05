@@ -1,0 +1,14 @@
+---
+- name: Playbook for lineinfile module check
+  hosts: uslv
+  gather_facts: no
+  user: rjoy
+  become: true
+  tasks:
+    - name: Uppend to the end of a regular expression
+      lineinfile:
+        dest: /tmp/testfile
+        regexp: 'GRUB_CMDLINE_LINUX="@kernel_arguments: @ crashkernel=auto rd.lvm.lv=vg_root/lv_root rd.lvm.lv=vg_root/swaplv_01 rhgb quiet"'
+        line: 'GRUB_CMDLINE_LINUX="@kernel_arguments: @ crashkernel=auto rd.lvm.lv=vg_root/lv_root rd.lvm.lv=vg_root/swaplv_01 rhgb quiet transparent_hugepage=never"'
+        backup: yes
+...

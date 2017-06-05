@@ -1,0 +1,25 @@
+---
+#Ansible playbook to update the IP address on servers with newly assigned subnet.
+- name: Update IP address to servers assigned on opsware VLAN.
+  hosts: ERP
+  gather_facts: no
+  user: rjoy
+  become: true
+
+  environment:
+    PATH: '/usr/sbin:/sbin:/usr/bin:/bin'
+
+  tasks:
+    - name: Substitute line in sysconfig interface config with previously applied IP
+      lineinfile:
+         dest: /etc/sysconfig/network-scripts/ifcfg-eno16780032
+         regexp: 'IPADDR='
+         line: 'IPADDR=10.200.180.116'
+
+    - name: Substitute line in sysconfig interface config with previously applied IP
+      lineinfile:
+         dest: /etc/sysconfig/network-scripts/ifcfg-eno16780032:0
+         regexp: 'IPADDR='
+         line: 'IPADDR=10.200.180.117'
+
+
