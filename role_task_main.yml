@@ -60,7 +60,7 @@
 - name: Play for SHM
   include: "kernel.yml"
     
-# ask Santosh what this task is for
+#
 #- name: Load Kernel Module Bridge
 #  command: modprobe bridge
 #  ignore_errors: yes
