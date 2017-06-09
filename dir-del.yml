@@ -1,9 +1,0 @@
----
-
-- name: Playbook to delete the directory from remote host
-  hosts: filer_unavail
-  gather_facts: yes
-  become: true
-  tasks:
-    - name: Delete remote directory if present
-      file: path=/var/tmp/filer_unavail_logs state=absent
