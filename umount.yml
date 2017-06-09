@@ -1,21 +1,69 @@
 ---
-- name: Playbook for unmounting the partitions and subpartitions under /sapdb
-  hosts: erp
+# PURPOSE: Unmount a provided mountpoint from the linux servers and remove entries from fstab or automount. 
+# #
+# # ASSUMPTIONS:
+# o  Hosts in the inventory are expected to be Linux servers
+# o  Playbook execution directory expected to be /tmp on uslv-sapp-lnx06
+# o  Add hosts to do bulk umount under [umount_hosts] in /tmp/hosts
+# o  Enable user key-pair with the hosts on /tmp/hosts and expected to have sudo privilege
+# o  Once executed, provide the mountpoint(when prompted) to be unmounted with one at a time.
+# EXECUTION: ansible-playbook -i hosts umount.yml -Kk
+#
+- name: Unmount Filesystems
+  hosts: umount_hosts
   gather_facts: no
-  user: rjoy
   become: true
+
+  environment:
+    PATH: '/usr/sbin:/sbin:/usr/bin:/bin'
+
+  vars_prompt:
+  - name: mount_point_name
+    prompt: ENTER THE MOUNTPOINT NAME TO UNMOUNT
+    default: 'no_entry_skips'
+    private: no
+
   tasks:
-    - name: Check if /sapdb/ mounted on /dev/sde
-      shell: df -h | grep "/sapdb" | egrep -v "JS1" | awk '{print $1}'
-      register: sapdb
-    - debug: var=sapdb.stdout_lines
-   
-    - name: Check the subdirectory mounts
-      shell: df -h | grep "/sapdb" | sort -r | awk '{print $6}'
-      register: umounts
+    - name: Umount the filesystem if mounted
+      mount:
+        name: '{{ mount_point_name }}'
+        state: unmounted
+      when: 
+        - mount_point_name != "/"
+        - mount_point_name != "/boot"
+        - mount_point_name != "/dev/"
+        - mount_point_name != "/sys"
+        - mount_point_name != "/proc"
+        - mount_point_name != "no_entry_skips"
 
-    - name: Unmount the directories
-      shell: umount -l {{ item }}
+    - name: Remove the entry from fstab if exists
+      lineinfile:
+        dest: '/etc/fstab'
+        regexp: ' {{ mount_point_name }} '
+        state: absent
+        backup: yes
+      when:
+        - mount_point_name != "/"
+        - mount_point_name != "/boot"
+        - mount_point_name != "/dev/"
+        - mount_point_name != "/sys"
+        - mount_point_name != "/proc"
+        - mount_point_name != "no_entry_skips"
+
+    - name: Remove the entries from automount if exists
+      lineinfile:
+        dest: "{{ item }}"
+        state: absent
+        regexp: '^{{ mount_point_name }} '
+        backup: yes
+      register: result
+      ignore_errors: yes
+      when: mount_point_name != "no_entry_skips"
       with_items:
-       - "{{ umounts.stdout_lines }}"
+       - /etc/auto.direct
+       - /etc/auto.datashare
+       - /etc/auto.share
 
+    - name: Restart autofs if  automount files change
+      service: name=autofs state=reloaded
+      when: result.changed
